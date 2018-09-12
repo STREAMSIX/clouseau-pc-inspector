@@ -34,13 +34,16 @@
             this.ClearButton = new System.Windows.Forms.Button();
             this.SaveButton = new System.Windows.Forms.Button();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.applicationInfoSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.applicationDetailedList = new System.Windows.Forms.ListView();
             this.DisplayName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.DisplayVersion = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Version = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.InstallDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.RegLocation = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.saveDxDiagButton = new System.Windows.Forms.Button();
+            this.dxDiagSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.dxdiagBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,9 +51,9 @@
             // 
             this.StartButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.StartButton.Location = new System.Drawing.Point(12, 12);
+            this.StartButton.Location = new System.Drawing.Point(158, 12);
             this.StartButton.Name = "StartButton";
-            this.StartButton.Size = new System.Drawing.Size(710, 54);
+            this.StartButton.Size = new System.Drawing.Size(564, 54);
             this.StartButton.TabIndex = 0;
             this.StartButton.Text = "Start";
             this.StartButton.UseVisualStyleBackColor = true;
@@ -66,7 +69,6 @@
             this.richTextBox1.Size = new System.Drawing.Size(734, 63);
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "";
-            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
             // 
             // ClearButton
             // 
@@ -101,9 +103,9 @@
             this.flowLayoutPanel1.Size = new System.Drawing.Size(734, 33);
             this.flowLayoutPanel1.TabIndex = 5;
             // 
-            // saveFileDialog1
+            // applicationInfoSaveFileDialog
             // 
-            this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
+            this.applicationInfoSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.applicationInfoSaveFileOk);
             // 
             // applicationDetailedList
             // 
@@ -122,7 +124,6 @@
             this.applicationDetailedList.TabIndex = 6;
             this.applicationDetailedList.UseCompatibleStateImageBehavior = false;
             this.applicationDetailedList.View = System.Windows.Forms.View.Details;
-            this.applicationDetailedList.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
             // 
             // DisplayName
             // 
@@ -150,11 +151,32 @@
             this.RegLocation.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.RegLocation.Width = 80;
             // 
+            // saveDxDiagButton
+            // 
+            this.saveDxDiagButton.Location = new System.Drawing.Point(12, 12);
+            this.saveDxDiagButton.Name = "saveDxDiagButton";
+            this.saveDxDiagButton.Size = new System.Drawing.Size(140, 54);
+            this.saveDxDiagButton.TabIndex = 7;
+            this.saveDxDiagButton.Text = "Save DxDiag";
+            this.saveDxDiagButton.UseVisualStyleBackColor = true;
+            this.saveDxDiagButton.Click += new System.EventHandler(this.saveDxDiagButton_Click);
+            // 
+            // dxDiagSaveFileDialog
+            // 
+            this.dxDiagSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.dxDiagSaveFileOk);
+            // 
+            // dxdiagBackgroundWorker
+            // 
+            this.dxdiagBackgroundWorker.WorkerSupportsCancellation = false;
+            this.dxdiagBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.dxdiagBackgroundWorker_DoWork);
+            this.dxdiagBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.DxdiagBackgroundWorker_RunWorkerCompleted);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(734, 461);
+            this.Controls.Add(this.saveDxDiagButton);
             this.Controls.Add(this.applicationDetailedList);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.richTextBox1);
@@ -175,13 +197,16 @@
         private System.Windows.Forms.Button ClearButton;
         private System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.SaveFileDialog applicationInfoSaveFileDialog;
         private System.Windows.Forms.ListView applicationDetailedList;
         private System.Windows.Forms.ColumnHeader DisplayName;
         private System.Windows.Forms.ColumnHeader DisplayVersion;
         private System.Windows.Forms.ColumnHeader Version;
         private System.Windows.Forms.ColumnHeader InstallDate;
         private System.Windows.Forms.ColumnHeader RegLocation;
+        private System.Windows.Forms.Button saveDxDiagButton;
+        private System.Windows.Forms.SaveFileDialog dxDiagSaveFileDialog;
+        private System.ComponentModel.BackgroundWorker dxdiagBackgroundWorker;
     }
 }
 

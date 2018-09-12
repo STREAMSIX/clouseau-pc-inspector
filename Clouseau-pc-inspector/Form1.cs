@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using System.IO;
+using System.Diagnostics;
+using System.Threading;
 
 namespace PC_Inspector
 {
@@ -46,7 +48,7 @@ namespace PC_Inspector
                 this.richTextBox1.AppendText(string.Format("x64 had {0} installed applications", x64Applications.Count) + Environment.NewLine);
             }
 
-            
+
             // localuser
             using(RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default))
             using(RegistryKey key = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
@@ -62,9 +64,10 @@ namespace PC_Inspector
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            saveFileDialog1.Filter = "Json|*.json";
-            saveFileDialog1.Title = "Save pc report";
-            saveFileDialog1.ShowDialog();
+            applicationInfoSaveFileDialog.FileName = "applicationReport";
+            applicationInfoSaveFileDialog.Filter = "Json|*.json";
+            applicationInfoSaveFileDialog.Title = "Save pc report";
+            applicationInfoSaveFileDialog.ShowDialog();
         }
 
         private void clearButton_Click(object sender, EventArgs e)
@@ -78,40 +81,25 @@ namespace PC_Inspector
             this.richTextBox1.Clear();
             this.applicationDetailedList.Items.Clear();
         }
-
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-        private void richTextBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
+        
+        private void applicationInfoSaveFileOk(object sender, CancelEventArgs e)
         {
             if(this.allApplicationInfos != null && this.allApplicationInfos.Count > 0)
             {
-                if(!string.IsNullOrWhiteSpace(saveFileDialog1.FileName))
+                if(!string.IsNullOrWhiteSpace(applicationInfoSaveFileDialog.FileName))
                 {
-                    this.richTextBox1.AppendText("Saving PC report to ... " + saveFileDialog1.FileName + Environment.NewLine, Color.Green);
+                    this.richTextBox1.AppendText("Saving PC report to ... " + applicationInfoSaveFileDialog.FileName + Environment.NewLine, Color.Green);
 
-                    File.WriteAllText(this.saveFileDialog1.FileName, JsonConvert.SerializeObject(this.allApplicationInfos, Formatting.Indented));
+                    File.WriteAllText(this.applicationInfoSaveFileDialog.FileName, JsonConvert.SerializeObject(this.allApplicationInfos, Formatting.Indented));
                 }
             }
             else
             {
-                this.richTextBox1.AppendText("Nothing to save no report was generated ... " + Environment.NewLine,Color.Orange);
+                this.richTextBox1.AppendText("Nothing to save no report was generated ... " + Environment.NewLine, Color.Orange);
             }
 
         }
-
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
+        
         private void processApplicationInfos(List<ApplicationInfo> regApplicationInfo)
         {
             foreach(ApplicationInfo appInfo in regApplicationInfo)
@@ -121,6 +109,82 @@ namespace PC_Inspector
 
                 allApplicationInfos.Add(appInfo);
             }
+        }
+
+        private void dxDiagSaveFileOk(object sender, CancelEventArgs e)
+        {
+            this.richTextBox1.AppendText("Started up dxdiag ... " + Environment.NewLine);
+            this.dxdiagBackgroundWorker.RunWorkerAsync();
+        }
+
+        private void runAndSaveDxDiag()
+        {
+            var psi = new ProcessStartInfo();
+            if(IntPtr.Size == 4 && Environment.Is64BitOperatingSystem)
+            {
+                // Need to run the 64-bit version
+                psi.FileName = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+                    "sysnative\\dxdiag.exe");
+
+                Invoke(new Action(() =>
+                {
+                    this.richTextBox1.AppendText("64bit dxdiag ..." + Environment.NewLine);
+                }));
+            }
+            else
+            {
+                // Okay with the native version
+                psi.FileName = System.IO.Path.Combine(
+                    Environment.SystemDirectory,
+                    "dxdiag.exe");
+
+                Invoke(new Action(() =>
+                {
+                    this.richTextBox1.AppendText("32bit dxdiag ..." + Environment.NewLine);
+                }));
+            }
+
+            try
+            {
+                psi.Arguments = "/x " + dxDiagSaveFileDialog.FileName;
+                using(var prc = Process.Start(psi))
+                {
+                    prc.WaitForExit();
+                    
+                    if(prc.ExitCode != 0)
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            this.richTextBox1.AppendText("Error: DXDIAG failed with exit code " + prc.ExitCode.ToString(),Color.Red);
+                        }));
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                Invoke(new Action(() =>
+                {
+                    this.richTextBox1.AppendText("Exception: " + ex.ToString() + " occured trying to run dxdiag ...", Color.Red);
+                }));
+            }
+        }
+
+        private void saveDxDiagButton_Click(object sender, EventArgs e)
+        {
+            dxDiagSaveFileDialog.FileName = "dxdiag";
+            dxDiagSaveFileDialog.Filter = "Text|*.txt";
+            dxDiagSaveFileDialog.Title = "Save dxdiag report";
+            dxDiagSaveFileDialog.ShowDialog();
+        }
+
+        private void dxdiagBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            runAndSaveDxDiag();
+        }
+        private void DxdiagBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            this.richTextBox1.AppendText("finished saving dxdiag to file ... "  + dxDiagSaveFileDialog.FileName + Environment.NewLine, Color.Green);
         }
     }
 
@@ -203,7 +267,7 @@ namespace PC_Inspector
                                 InstallDate = subkey.GetValue("InstallDate")?.ToString().Trim(),
                                 RegLocation = regLocation
                             };
-                            
+
                             regApplicationInfos.Add(appInfo);
                         }
                         catch(Exception ex)
