@@ -147,7 +147,7 @@ namespace PC_Inspector
 
             try
             {
-                psi.Arguments = "/x " + dxDiagSaveFileDialog.FileName;
+                psi.Arguments = "/t " + dxDiagSaveFileDialog.FileName;
                 using(var prc = Process.Start(psi))
                 {
                     prc.WaitForExit();
