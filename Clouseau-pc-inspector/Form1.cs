@@ -21,7 +21,5 @@ namespace PC_Inspector
         {
             InitializeComponent();
         }
-
-        
     }
 }

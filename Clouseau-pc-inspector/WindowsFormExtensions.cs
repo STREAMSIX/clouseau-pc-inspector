@@ -18,5 +18,10 @@ namespace PC_Inspector
             box.AppendText(text);
             box.SelectionColor = box.ForeColor;
         }
+
+        public static bool ContainsAnyOf(this string source, params string[] strings)
+        {
+            return strings.Any(x => source.Contains(x));
+        }
     }
 }
