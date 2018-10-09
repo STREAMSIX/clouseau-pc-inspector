@@ -58,6 +58,7 @@
             this.inspectApplicationBtn = new System.Windows.Forms.Button();
             this.tabPage_DxDiag = new System.Windows.Forms.TabPage();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.dxdiagPreviewTextBox = new System.Windows.Forms.RichTextBox();
             this.flowLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage_Codecs.SuspendLayout();
@@ -161,10 +162,12 @@
             // 
             // saveDxDiagButton
             // 
-            this.saveDxDiagButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.saveDxDiagButton.Location = new System.Drawing.Point(545, 327);
+            this.saveDxDiagButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.saveDxDiagButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.saveDxDiagButton.Location = new System.Drawing.Point(6, 6);
             this.saveDxDiagButton.Name = "saveDxDiagButton";
-            this.saveDxDiagButton.Size = new System.Drawing.Size(140, 54);
+            this.saveDxDiagButton.Size = new System.Drawing.Size(1215, 53);
             this.saveDxDiagButton.TabIndex = 7;
             this.saveDxDiagButton.Text = "Save DxDiag";
             this.saveDxDiagButton.UseVisualStyleBackColor = true;
@@ -249,33 +252,32 @@
             // columnHeader2
             // 
             this.columnHeader2.Text = "File Version";
-            this.columnHeader2.Width = 160;
+            this.columnHeader2.Width = 210;
             // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "File Description";
-            this.columnHeader3.Width = 125;
+            this.columnHeader3.Width = 181;
             // 
             // columnHeader4
             // 
             this.columnHeader4.Text = "Install/Modified Date";
-            this.columnHeader4.Width = 127;
+            this.columnHeader4.Width = 115;
             // 
             // columnHeader5
             // 
             this.columnHeader5.Text = "Type";
-            this.columnHeader5.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.columnHeader5.Width = 80;
+            this.columnHeader5.Width = 158;
             // 
             // columnHeader6
             // 
             this.columnHeader6.Text = "Filename";
-            this.columnHeader6.Width = 156;
+            this.columnHeader6.Width = 202;
             // 
             // columnHeader7
             // 
             this.columnHeader7.Text = "Driver Key";
-            this.columnHeader7.Width = 65;
+            this.columnHeader7.Width = 111;
             // 
             // tabPage_Application
             // 
@@ -305,6 +307,7 @@
             // 
             // tabPage_DxDiag
             // 
+            this.tabPage_DxDiag.Controls.Add(this.dxdiagPreviewTextBox);
             this.tabPage_DxDiag.Controls.Add(this.saveDxDiagButton);
             this.tabPage_DxDiag.Location = new System.Drawing.Point(4, 22);
             this.tabPage_DxDiag.Name = "tabPage_DxDiag";
@@ -319,10 +322,23 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1059, 411);
+            this.tabPage1.Size = new System.Drawing.Size(1227, 554);
             this.tabPage1.TabIndex = 3;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // dxdiagPreviewTextBox
+            // 
+            this.dxdiagPreviewTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dxdiagPreviewTextBox.Location = new System.Drawing.Point(6, 65);
+            this.dxdiagPreviewTextBox.Name = "dxdiagPreviewTextBox";
+            this.dxdiagPreviewTextBox.ReadOnly = true;
+            this.dxdiagPreviewTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.dxdiagPreviewTextBox.Size = new System.Drawing.Size(1215, 483);
+            this.dxdiagPreviewTextBox.TabIndex = 8;
+            this.dxdiagPreviewTextBox.Text = "";
             // 
             // Form1
             // 
@@ -374,6 +390,7 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ColumnHeader columnHeader7;
+        private System.Windows.Forms.RichTextBox dxdiagPreviewTextBox;
     }
 }
 
