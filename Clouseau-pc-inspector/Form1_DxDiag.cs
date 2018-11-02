@@ -29,7 +29,7 @@ namespace PC_Inspector
 
                 Invoke(new Action(() =>
                 {
-                    this.richTextBox1.AppendText("64bit dxdiag ..." + Environment.NewLine);
+                    this.inAppLogTextBox.AppendText("64bit dxdiag ..." + Environment.NewLine);
                 }));
             }
             else
@@ -41,7 +41,7 @@ namespace PC_Inspector
 
                 Invoke(new Action(() =>
                 {
-                    this.richTextBox1.AppendText("32bit dxdiag ..." + Environment.NewLine);
+                    this.inAppLogTextBox.AppendText("32bit dxdiag ..." + Environment.NewLine);
                 }));
             }
 
@@ -56,7 +56,7 @@ namespace PC_Inspector
                     {
                         Invoke(new Action(() =>
                         {
-                            this.richTextBox1.AppendText("Error: DXDIAG failed with exit code " + prc.ExitCode.ToString(), Color.Red);
+                            this.inAppLogTextBox.AppendText("Error: DXDIAG failed with exit code " + prc.ExitCode.ToString(), Color.Red);
                         }));
                     }
                 }
@@ -65,14 +65,14 @@ namespace PC_Inspector
             {
                 Invoke(new Action(() =>
                 {
-                    this.richTextBox1.AppendText("Exception: " + ex.ToString() + " occured trying to run dxdiag ...", Color.Red);
+                    this.inAppLogTextBox.AppendText("Exception: " + ex.ToString() + " occured trying to run dxdiag ...", Color.Red);
                 }));
             }
         }
 
         private void dxDiagSaveFileOk(object sender, CancelEventArgs e)
         {
-            this.richTextBox1.AppendText("Started up dxdiag ... " + Environment.NewLine);
+            this.inAppLogTextBox.AppendText("Started up dxdiag ... " + Environment.NewLine);
             this.dxdiagBackgroundWorker.RunWorkerAsync();
         }
 
@@ -91,7 +91,7 @@ namespace PC_Inspector
 
         private void DxdiagBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.richTextBox1.AppendText("finished saving dxdiag to file ... " + dxDiagSaveFileDialog.FileName + Environment.NewLine, Color.Green);
+            this.inAppLogTextBox.AppendText("finished saving dxdiag to file ... " + dxDiagSaveFileDialog.FileName + Environment.NewLine, Color.Green);
         }
     }   
 }

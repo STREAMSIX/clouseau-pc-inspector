@@ -19,13 +19,14 @@ namespace PC_Inspector
 {
     public partial class Form1 : Form
     {
-        private int codecSortColumn = -1;
+        private int mCodecSortColumn = -1;
+        private List<CodecInfo> mAllCodecInfo = new List<CodecInfo>();
 
         private void codecColumnHeader_Click(object sender, ColumnClickEventArgs e)
         {
-            if(e.Column != codecSortColumn)
+            if(e.Column != mCodecSortColumn)
             {
-                codecSortColumn = e.Column;
+                mCodecSortColumn = e.Column;
                 this.codecListView.Sorting = SortOrder.Ascending;
             }
             else
@@ -47,231 +48,68 @@ namespace PC_Inspector
 
         private void inspectCodecBtn_Click(object sender, EventArgs e)
         {
-            // HACK: Temporarly disabled
-            if(false)
+
+            this.inAppLogTextBox.AppendText("Codec drivers" + Environment.NewLine);
+            // Codec drivers
+            using(RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default))
+            using(RegistryKey key = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Drivers32"))
             {
-                this.richTextBox1.AppendText("Codec drivers" + Environment.NewLine);
-                // Codec drivers
-                using(RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default))
-                using(RegistryKey key = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Drivers32"))
-                {
-                    inspectCodecDrivers(key);
-                }
+                List<CodecInfo> driverInfos = CodecInfo.AllCodecDriversInfoForRegKey(key, this.inAppLogTextBox);
+                processCodecInfos(driverInfos);
+
+                this.inAppLogTextBox.AppendText(string.Format("{0} codecs driver found", driverInfos.Count) + Environment.NewLine);
             }
+
 
             // DirectShow filters
 
-            this.richTextBox1.AppendText("DirectShow Filters " + Environment.NewLine);
+            this.inAppLogTextBox.AppendText("DirectShow Filters " + Environment.NewLine);
 
             using(RegistryKey hkcr = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Default))
             using(RegistryKey key = hkcr.OpenSubKey(@"CLSID\{083863F1-70DE-11d0-BD40-00A0C911CE86}\Instance"))
             {
-                foreach(string subKeyName in key.GetSubKeyNames())
+                List<CodecInfo> directShowFilterInfos = CodecInfo.AllDirectShowFilterInfoForRegKey(key, this.inAppLogTextBox);
+                processCodecInfos(directShowFilterInfos);
+
+                this.inAppLogTextBox.AppendText(string.Format("{0} direct show filters found", directShowFilterInfos.Count) + Environment.NewLine);
+            }
+        }
+        
+        private void saveCodecBtn_Click(object sender, EventArgs e)
+        {
+            codecInfoSaveFileDialog.FileName = "codecReport";
+            codecInfoSaveFileDialog.Filter = "Json|*.json";
+            codecInfoSaveFileDialog.Title = "Save Codec Report";
+            codecInfoSaveFileDialog.ShowDialog();
+        }
+
+        private void codecInfoSaveFileOk(object sender, CancelEventArgs e)
+        {
+            if((this.mAllCodecInfo != null) &&
+                (this.mAllCodecInfo.Count > 0))
+            {
+                if(!string.IsNullOrWhiteSpace(codecInfoSaveFileDialog.FileName))
                 {
-                    using(RegistryKey subkey = key.OpenSubKey(subKeyName))
-                    {
-                        string friendlyName = subkey.GetValue("FriendlyName")?.ToString().Trim();
-                        string clsid = subkey.GetValue("CLSID")?.ToString().Trim();
+                    this.inAppLogTextBox.AppendText("Saving PC's Codec report to ... " + codecInfoSaveFileDialog.FileName + Environment.NewLine, Color.Green);
 
-                        this.richTextBox1.AppendText(friendlyName + " : " + clsid);
-                        this.richTextBox1.AppendText(Environment.NewLine);
-
-                        string fileName = "";
-
-                        #region Related registry location
-                        using(RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default))
-                        using(RegistryKey relatedKey = hklm.OpenSubKey(@"SOFTWARE\Classes\CLSID\" + clsid + @"\InprocServer32"))
-                        {
-                            if(relatedKey != null)
-                            {
-                                foreach(string valueName in relatedKey.GetValueNames())
-                                {
-                                    if(valueName.Length == 0)
-                                    {
-                                        string dataValue = relatedKey.GetValue(valueName).ToString();
-
-                                        if(!string.IsNullOrWhiteSpace(dataValue))
-                                        {
-                                            fileName = dataValue;
-                                        }
-
-                                        this.richTextBox1.AppendText(valueName + " : " + dataValue);
-                                        this.richTextBox1.AppendText(Environment.NewLine);
-                                    }
-
-                                }
-                            }
-                        }
-
-                        if(File.Exists(fileName))
-                        {
-                            FileInfo fi = new FileInfo(fileName);
-                            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(fileName);
-
-                            CodecInfo ci = new CodecInfo
-                            {
-                                DisplayName = friendlyName,
-                                FileVersion = fvi.FileVersion?.ToString().Trim(),
-                                FileDescription = fvi.FileDescription?.ToString().Trim(),
-                                InstallModDate = fi.LastWriteTime.ToLongDateString()?.ToString().Trim(),
-                                FileName = fileName,
-                                DriverType = "DirectShow Filter",
-                            };
-
-                            ListViewItem audItem = new ListViewItem(ci.FormatForFormList());
-                            this.codecListView.Items.Add(audItem);
-                        }
-
-                        #endregion
-                    }
+                    File.WriteAllText(this.codecInfoSaveFileDialog.FileName, JsonConvert.SerializeObject(this.mAllCodecInfo, Formatting.Indented));
                 }
+            }
+            else
+            {
+                this.inAppLogTextBox.AppendText("Nothing to save no report was generated ... " + Environment.NewLine, Color.Orange);
             }
         }
 
-        private void inspectCodecDrivers(RegistryKey key)
+        private void processCodecInfos(List<CodecInfo> regCodecInfos)
         {
-            string system32Path = Environment.SystemDirectory;
-
-            int audioAndVideoDriverCount = 0;
-            foreach(string valueName in key.GetValueNames())
+            foreach(CodecInfo codecInfo in regCodecInfos)
             {
-                string dataValue = key.GetValue(valueName).ToString();
-                this.richTextBox1.AppendText(valueName + " : " + dataValue);
+                ListViewItem item = new ListViewItem(codecInfo.FormatForFormList());
+                this.codecListView.Items.Add(item);
 
-                string driverPath = "";
-
-                string dirName = Path.GetDirectoryName(dataValue);
-
-                if(!string.IsNullOrWhiteSpace(dirName) &&
-                    dirName.ToUpperInvariant().Equals(system32Path.ToUpperInvariant()))
-                {
-                    this.richTextBox1.AppendText(" <-----");
-                    driverPath = dataValue;
-                }
-                else
-                {
-                    driverPath = Path.Combine(system32Path, dataValue);
-                }
-
-                this.richTextBox1.AppendText(Environment.NewLine);
-
-                this.richTextBox1.AppendText(driverPath);
-                bool isFileExists = File.Exists(driverPath);
-                this.richTextBox1.AppendText(isFileExists ? " -Exists" : " -NotFound", isFileExists ? Color.Green : Color.Red);
-
-
-                FileInfo fi = new FileInfo(driverPath);
-                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(driverPath);
-
-                CodecInfo ci = new CodecInfo
-                {
-                    DisplayName = valueName,
-                    FileVersion = fvi.FileVersion?.ToString().Trim(),
-                    FileDescription = fvi.FileDescription?.ToString().Trim(),
-                    InstallModDate = fi.LastWriteTime.ToLongDateString()?.ToString().Trim(),
-                    FileName = driverPath,
-                    DriverKey = valueName
-                };
-
-
-                string driverFileType = Path.GetExtension(driverPath);
-                Color fileTypeColor = Color.Black;
-                switch(driverFileType)
-                {
-                    case ".dll":
-                    fileTypeColor = Color.Blue;
-                    ci.DriverType = "Video";
-
-                    ListViewItem vidItem = new ListViewItem(ci.FormatForFormList());
-                    this.codecListView.Items.Add(vidItem);
-
-                    audioAndVideoDriverCount++;
-                    break;
-
-                    case ".acm":
-                    fileTypeColor = Color.Brown;
-                    ci.DriverType = "Audio";
-
-                    ListViewItem audItem = new ListViewItem(ci.FormatForFormList());
-                    this.codecListView.Items.Add(audItem);
-
-                    audioAndVideoDriverCount++;
-                    break;
-
-                    case ".drv":
-                    ci.DriverType = "HardWare";
-                    fileTypeColor = Color.DarkGoldenrod;
-                    break;
-
-                    default:
-                    break;
-                }
-
-                this.richTextBox1.AppendText(" " + driverFileType, fileTypeColor);
-
-                this.richTextBox1.AppendText(Environment.NewLine);
+                mAllCodecInfo.Add(codecInfo);
             }
-
-            this.richTextBox1.AppendText("ValueName count " + key.GetValueNames().Length + Environment.NewLine);
-            this.richTextBox1.AppendText("audioAndVideoDriverCount " + audioAndVideoDriverCount + Environment.NewLine);
-        }
-    }
-
-    class ListViewItemComparer : IComparer
-    {
-        private int col;
-        private SortOrder order;
-
-        public ListViewItemComparer()
-        {
-            col = 0;
-            order = SortOrder.Ascending;
-        }
-
-        public ListViewItemComparer(int column, SortOrder order)
-        {
-            col = column;
-            this.order = order;
-        }
-
-        public int Compare(object x, object y)
-        {
-            int returnVal = -1;
-
-            returnVal = String.Compare(((ListViewItem)x).SubItems[col].Text,
-                                       ((ListViewItem)y).SubItems[col].Text);
-
-            if(order == SortOrder.Descending)
-            {
-                returnVal *= -1;
-            }
-
-            return returnVal;
-        }
-    }
-
-    public class CodecInfo
-    {
-        public string DisplayName;
-        public string FileVersion;
-        public string FileDescription;
-        public string InstallModDate;
-        public string DriverType;
-        public string FileName;
-        public string DriverKey;
-
-        public string[] FormatForFormList()
-        {
-            return new string[]
-            {
-                DisplayName,
-                FileVersion,
-                FileDescription,
-                InstallModDate,
-                DriverType,
-                FileName,
-                DriverKey
-            };
         }
     }
 }

@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.inAppLogTextBox = new System.Windows.Forms.RichTextBox();
             this.applicationInfoSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.applicationDetailedList = new System.Windows.Forms.ListView();
+            this.applicationListView = new System.Windows.Forms.ListView();
             this.DisplayName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.DisplayVersion = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Version = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -57,46 +57,48 @@
             this.inspectApplicationBtn = new System.Windows.Forms.Button();
             this.tabPage_DxDiag = new System.Windows.Forms.TabPage();
             this.dxdiagPreviewTextBox = new System.Windows.Forms.RichTextBox();
+            this.codecInfoSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.tabControl1.SuspendLayout();
             this.tabPage_Codecs.SuspendLayout();
             this.tabPage_Application.SuspendLayout();
             this.tabPage_DxDiag.SuspendLayout();
             this.SuspendLayout();
             // 
-            // richTextBox1
+            // inAppLogTextBox
             // 
-            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.inAppLogTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBox1.Location = new System.Drawing.Point(12, 605);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.richTextBox1.Size = new System.Drawing.Size(1235, 104);
-            this.richTextBox1.TabIndex = 1;
-            this.richTextBox1.Text = "";
-            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
+            this.inAppLogTextBox.Location = new System.Drawing.Point(12, 605);
+            this.inAppLogTextBox.Name = "inAppLogTextBox";
+            this.inAppLogTextBox.ReadOnly = true;
+            this.inAppLogTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.inAppLogTextBox.Size = new System.Drawing.Size(1235, 104);
+            this.inAppLogTextBox.TabIndex = 1;
+            this.inAppLogTextBox.Text = "";
+            this.inAppLogTextBox.TextChanged += new System.EventHandler(this.inAppLogTextbox_TextChanged);
             // 
             // applicationInfoSaveFileDialog
             // 
             this.applicationInfoSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.applicationInfoSaveFileOk);
             // 
-            // applicationDetailedList
+            // applicationListView
             // 
-            this.applicationDetailedList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.applicationListView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.applicationDetailedList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.applicationListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.DisplayName,
             this.DisplayVersion,
             this.Version,
             this.InstallDate,
             this.RegLocation});
-            this.applicationDetailedList.Location = new System.Drawing.Point(6, 65);
-            this.applicationDetailedList.Name = "applicationDetailedList";
-            this.applicationDetailedList.Size = new System.Drawing.Size(1215, 483);
-            this.applicationDetailedList.TabIndex = 6;
-            this.applicationDetailedList.UseCompatibleStateImageBehavior = false;
-            this.applicationDetailedList.View = System.Windows.Forms.View.Details;
+            this.applicationListView.Location = new System.Drawing.Point(6, 65);
+            this.applicationListView.Name = "applicationListView";
+            this.applicationListView.Size = new System.Drawing.Size(1215, 483);
+            this.applicationListView.TabIndex = 6;
+            this.applicationListView.UseCompatibleStateImageBehavior = false;
+            this.applicationListView.View = System.Windows.Forms.View.Details;
+            this.applicationListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.applicationColumnHeader_Click);
             // 
             // DisplayName
             // 
@@ -183,6 +185,7 @@
             this.saveCodecBtn.TabIndex = 10;
             this.saveCodecBtn.Text = "Save Codec Info";
             this.saveCodecBtn.UseVisualStyleBackColor = true;
+            this.saveCodecBtn.Click += new System.EventHandler(this.saveCodecBtn_Click);
             // 
             // inspectCodecBtn
             // 
@@ -257,7 +260,7 @@
             // 
             this.tabPage_Application.Controls.Add(this.saveApplicationBtn);
             this.tabPage_Application.Controls.Add(this.inspectApplicationBtn);
-            this.tabPage_Application.Controls.Add(this.applicationDetailedList);
+            this.tabPage_Application.Controls.Add(this.applicationListView);
             this.tabPage_Application.Location = new System.Drawing.Point(4, 22);
             this.tabPage_Application.Name = "tabPage_Application";
             this.tabPage_Application.Padding = new System.Windows.Forms.Padding(3);
@@ -315,13 +318,17 @@
             this.dxdiagPreviewTextBox.TabIndex = 8;
             this.dxdiagPreviewTextBox.Text = "";
             // 
+            // codecInfoSaveFileDialog
+            // 
+            this.codecInfoSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.codecInfoSaveFileOk);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1259, 721);
             this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.richTextBox1);
+            this.Controls.Add(this.inAppLogTextBox);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(750, 240);
             this.Name = "Form1";
@@ -335,9 +342,9 @@
         }
 
         #endregion
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.RichTextBox inAppLogTextBox;
         private System.Windows.Forms.SaveFileDialog applicationInfoSaveFileDialog;
-        private System.Windows.Forms.ListView applicationDetailedList;
+        private System.Windows.Forms.ListView applicationListView;
         private System.Windows.Forms.ColumnHeader DisplayName;
         private System.Windows.Forms.ColumnHeader DisplayVersion;
         private System.Windows.Forms.ColumnHeader Version;
@@ -363,6 +370,7 @@
         private System.Windows.Forms.RichTextBox dxdiagPreviewTextBox;
         private System.Windows.Forms.Button saveCodecBtn;
         private System.Windows.Forms.Button saveApplicationBtn;
+        private System.Windows.Forms.SaveFileDialog codecInfoSaveFileDialog;
     }
 }
 
