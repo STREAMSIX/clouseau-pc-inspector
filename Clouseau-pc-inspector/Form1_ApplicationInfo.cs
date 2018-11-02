@@ -57,17 +57,12 @@ namespace PC_Inspector
             this.richTextBox1.AppendText(string.Format("Found {0} installed applications", allApplicationInfos.Count) + Environment.NewLine);
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
+        private void saveApplicationBtn_Click(object sender, EventArgs e)
         {
             applicationInfoSaveFileDialog.FileName = "applicationReport";
             applicationInfoSaveFileDialog.Filter = "Json|*.json";
             applicationInfoSaveFileDialog.Title = "Save pc report";
             applicationInfoSaveFileDialog.ShowDialog();
-        }
-
-        private void clearButton_Click(object sender, EventArgs e)
-        {
-            clearApplicationsDetails();
         }
 
         private void applicationInfoSaveFileOk(object sender, CancelEventArgs e)

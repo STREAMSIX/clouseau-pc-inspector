@@ -21,5 +21,14 @@ namespace PC_Inspector
         {
             InitializeComponent();
         }
+
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+            this.richTextBox1.SelectionStart = this.richTextBox1.Text.Length;
+
+            this.richTextBox1.ScrollToCaret();
+        }
+
+        
     }
 }

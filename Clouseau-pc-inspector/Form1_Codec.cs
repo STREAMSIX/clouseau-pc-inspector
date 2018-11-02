@@ -40,6 +40,7 @@ namespace PC_Inspector
                 }
             }
 
+            this.codecListView.SetSortIcon(e.Column, this.codecListView.Sorting);
             this.codecListView.ListViewItemSorter = new ListViewItemComparer(e.Column,this.codecListView.Sorting);
             this.codecListView.Sort();
         }
