@@ -17,7 +17,7 @@ using System.Management;
 
 namespace PC_Inspector
 {
-    public partial class Form1 : Form
+    public partial class ClouseauForm : Form
     {
         private int mCodecSortColumn = -1;
         private List<CodecInfo> mAllCodecInfo = new List<CodecInfo>();

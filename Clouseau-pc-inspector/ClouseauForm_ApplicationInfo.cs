@@ -15,7 +15,7 @@ using System.Threading;
 
 namespace PC_Inspector
 {
-    public partial class Form1 : Form
+    public partial class ClouseauForm : Form
     {
         private int mApplicationSortColumn = -1;
         private List<ApplicationInfo> mAllApplicationInfos = new List<ApplicationInfo>();
